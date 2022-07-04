@@ -1,0 +1,65 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+
+# config/services.yaml
+imports:
+    - { resource: criteria_config.yaml }
+
+parameters:
+    app.location_api_key: '%env(APP_LOCATION_API_KEY)%'
+    app.location_api_domain: '%env(APP_LOCATION_API_URL)%'
+    app.reference_location: '%env(APP_REFERENCE_LOCATION)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        public: false
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    _instanceof:
+        App\Api\Core\Http\ControllerInterface:
+            public: true
+            tags: ['controller.service_arguments']
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\Api\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # App\Api\Domain\Repository\ILocationCriteriaRepository: '@App\Api\Port\Adapter\Repository\LocationCriteriaRepository.php'        
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    #App\Api\Application\Dto\CreateLocationCriteriaRequest:
+     #   autowire: true
+
+    # App\Api\Shared\:
+    #     resource: '../src/Shared/'
+    #     tags: ['controller.service_arguments']
+
+    # Register the CacheInterface
+    App\Api\Shared\Domain\Repository\Cache\ICacheRepository:
+        # You may change the cache adapter with a new class here
+        class: 'App\Api\Shared\Infrastructure\Cache\FileCache'
+        # Pass as arguments the required parameters of the root directory
+        # of the Sf project and the current environment
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $env: '%kernel.environment%'
+
+    App\Api\Application\Service\CriteriaService:      
+        arguments:  
+             $criterias: '%criterias_enabled%' 
+
+    App\Api\Port\Adapter\Symphony\EventListener\ExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }         

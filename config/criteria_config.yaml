@@ -1,0 +1,5 @@
+parameters:
+    criterias_enabled:
+        !php/const App\Api\Port\Adapter\Repository\Location\Criteria\Name::CRITERIA_ALIAS: true
+        !php/const App\Api\Port\Adapter\Repository\Location\Criteria\DayTemperature::CRITERIA_ALIAS: true
+        !php/const App\Api\Port\Adapter\Repository\Location\Criteria\Rival::CRITERIA_ALIAS: true

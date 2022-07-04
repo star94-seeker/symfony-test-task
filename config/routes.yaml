@@ -1,0 +1,5 @@
+#Routes V1
+check:
+  path: /check/{locationName}
+  defaults: { _controller: App\Api\Port\Adapter\Http\LocationCriteriaController }
+  methods: [GET]
